@@ -1,4 +1,4 @@
-package Week_3;
+package Week_3.part_1;
 import java.net.*;
 import java.io.*; 
 
@@ -11,7 +11,7 @@ public class Client {
 
 
             //HOMEWORK 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             InputStream is = socket.getInputStream();
             InputStreamReader ir = new InputStreamReader(is); // this is the solution for the force casting - Reader will only work with text

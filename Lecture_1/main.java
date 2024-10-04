@@ -5,6 +5,9 @@ import java.net.Socket;
 import javax.swing.*;
 import javax.swing.SwingUtilities;
 
+
+
+// random stuff not related 
 public class main {
     public static void main(String[] args) {
         GoogleSocket gs = new GoogleSocket();
