@@ -9,6 +9,10 @@ public class Client {
             Socket socket = new Socket("time.nist.gov", 13, inward, 0); // the inward here is the source address, without it the OS will use a default source address and the 2nd is the source port, if you put 0 then the OS will do it 
             // for you as usual - this is important in production env as you have many devices in ip a and you often need to change in the source ip address
 
+
+            //HOMEWORK 
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
             InputStream is = socket.getInputStream();
             InputStreamReader ir = new InputStreamReader(is); // this is the solution for the force casting - Reader will only work with text
             BufferedReader reader = new BufferedReader(ir);
@@ -17,8 +21,7 @@ public class Client {
             String line = null;
             while((line = reader.readLine())!= null) {
                 // this is much faster than the first loop, the previous code you printed character by character here you store them and the B doesnt care if you processed it or not 
-                response.append(line);
-                response.append("\r\n");
+                response.append(line).append("\r\n");
             }
             System.out.println(response.toString());
 
@@ -33,5 +36,9 @@ public class Client {
         } catch (Exception ex) {                                        
             System.err.println(ex);
         }
+    }
+
+    public void cleanerCode() {
+        
     }
 }
