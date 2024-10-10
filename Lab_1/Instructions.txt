@@ -1,0 +1,8 @@
+For this lab, you are required to write a java application to create a distributed system consisting of 4 nodes (A,B,C,D).
+
+Node A generates a random number, and then it forwards it to the network according to the attached network topology. When it receives the number back, A should print it.
+
+ * Create a network with 4 nodes(A,B,C,D) - launch 4 classes in 4 jvm
+ * 
+ * launch A --> generate a random number then ---> send it to B ---> B recives it then forwards it to ----> C then forwards it to D ---> forwards it to A ---> A will print the number
+ * A ring topology from A -> B -> C -> D -> A print number
