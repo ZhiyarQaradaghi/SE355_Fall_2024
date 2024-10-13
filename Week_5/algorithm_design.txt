@@ -1,0 +1,43 @@
+- 3 types of events in distributed systems
+
+
+
+1. Internal events - those that happens internally in the process itself/ will not deal with network stack- does not deal with communication channel/ example: Scanner - mutates the local state of that process
+2. Send (msg)
+3. Recieve (msg)
+
+Every event is going to mutate the global state of the system in one shape or form
+
+The order of the event is verrryy important (like when you run A.java and it doesnt work unless B.java is running)
+
+
+How to model the order of these events?
+
+inefficient way: total order - describe every single event, when they will occur, how they will occur, state order of like 1 million events if you have that much
+- why its bad, if C -> B -> A then D comes in between B and A in runtime
+
+partial order: Pick certain events that matter to you, ignore others. A,B,C -- B -> A but i did not mention C because it could be before B or After A i dont care
+-- partial order is used
+
+partial order is used by describing the happens before relation: showing an event that happens before an event - e2 will always happen before e3 --- send event always happens before receive
+
+ex:
+
+if X -> Y and Y does not become before X
+
+Concurrency
+x || y  -- when they occur at the same time - parallelism
+x || y -- when they are logicall concurrent - maybe not at the same time but within the same time window (a little bit before or after) - as long as you dont jump over another event
+
+if x||y and y||z then is x||z ? (transitivity) -- NO 
+
+For any two events in a distributed system:
+
+1. EIther a happens before b 
+2. OR b happens before a 
+3. OR they are concurrent 
+
+
+What is the whole point of modeling all this? 
+-- To answer if my algorithm is correct 
+-- What will happen if something gets deleted? Something is faulty? How will this effect my system and what can I do to fix it? Shows causality -- basically really good for debugging 
