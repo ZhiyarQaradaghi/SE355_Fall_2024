@@ -1,0 +1,33 @@
+If you have a happens before relationship between 2 events, then you can conclude that x has caused y(Directly or indirectly)
+x-->y 
+
+SE perspective: This is a causal dependency, causation 
+
+Each event has a past and future, 
+    1. Events that are in the past MUST happen BEFORE you
+    2. Events that are in the future MUST happen AFTER you
+
+Looking at the past, you can analyse the system, debug the system, monitor the system ---
+- any tool about these is all about analysing the past
+
+Looking at  the future, potentially you can effect the other events once the current event is done - directly or indirectly
+                            |no certainty 
+
+You can control other processes -- once the given event has occured: How can I reprogram/program parts of the sys? 
+-- EVENT DRIVEN PROGRAMMING 
+
+SCENARIO
+                x internal - if this occurs, I want another internal event in B to happen (future)
+                    |
+                        send event to make x->y
+                        |
+A -----------------e1---en-----------------------
+                        |
+                         |          y internal
+                           | recieve |
+B --------------------------en------e1---e2--e3-e4-----
+
+
+I want A ----> B to either call func1 or func2 depending on A 
+
+Java RMI

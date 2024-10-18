@@ -1,0 +1,44 @@
+Causality
+
+Network models: -- Theory
+1- Synchronous Model - The maximum delay for any given message between sender and receiver - In practice this barely exist
+2- Asynchronous Model - I do not know the maximum delay/upper bound - Can change rapidly- but on average I can predict just not maximum/worst case i cannot predict - in real life most of the time its this
+3- Partial Synchronous Model - (HW) It fits in the middle of Synchronous and Asynchronous - In practice this is used bit more than synch
+
+
+x->y x happens before y is similar to x<y 
+
+if x happens before y, x could have caused y to happen --> it might have had some side effect of having y
+y could not have caused x to occur 
+
+There is a good chance that x has effected the global state that is why we have y but that is not 100% certainty 
+
+If you can prove 2 events with happens before: x->y - you can say x causes y to some degree
+
+x->y or x caused y - expresses causel dependencies between events
+
+The moment I use the network - I will effect other processes -- COMMUNICATION highlights causation dependencies 
+
+There is no casuality progagated with concurrent events -- this is why we have partial order 
+
+
+casuality in the perspective of an event: 
+
+
+p2-------------send-----------------receive----
+                |      concurrency     |
+                |    partial order    |
+PAST             |       |           |     Future
+p1 -----total order --- e1 --- total order --------------
+                         | 
+                     partial order
+                        concurrency
+
+For every receive, I have a send according to the global state cut, send in past and recieve in future 
+
+If you optimize the past, make it faster, you make e1 show up earlier in the past. If future is optomized, it becomes more responsive
+
+The easiest to optomize is the concurrency above and below e1 
+
+a-->b
+I can make a control what b does (control the future)
