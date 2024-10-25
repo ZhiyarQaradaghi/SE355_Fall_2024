@@ -5,7 +5,7 @@ public class Server{
 	public static void main(String...args) throws Exception{
 
 		BasicGreetingServiceImpl greeting = new BasicGreetingServiceImpl(); //Tightly coupled; Ochhhhh!
-		ServerSocket server = new ServerSocket(8080);
+		ServerSocket server = new ServerSocket(8280);
 		while(true){
 			System.out.println("Waiting for a client");
 			Socket client = server.accept();

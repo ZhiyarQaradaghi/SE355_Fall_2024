@@ -4,7 +4,7 @@ import java.rmi.registry.*;
 
 public class Server{
 	public static void main(String...args) throws Exception{
-		GreetingService server = new BasicGreetingServiceImpl();
+		GreetingService server = (GreetingService) new BasicGreetingServiceImpl();
 
 		GreetingService stub = (GreetingService)
 					UnicastRemoteObject.exportObject(server, 0);
