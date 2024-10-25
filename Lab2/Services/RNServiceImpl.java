@@ -1,3 +1,4 @@
+package Services;
 import java.util.Random;
 public class RNServiceImpl implements RandomNumberService {
     public int generateRandomNumber() {
