@@ -1,12 +1,12 @@
-package Server_X;
+package Server_Y;
 
 import java.io.*;
 import java.net.*;
 import Handlers.ClientReader;
 
-public class X {
+public class Y {
     public static void main(String... args) {
-        try (ServerSocket server = new ServerSocket(5005)) {
+        try (ServerSocket server = new ServerSocket(5006)) {
             System.out.println("Listening on port: " + server.getLocalPort());
             while (true) {
                 try {
@@ -19,7 +19,7 @@ public class X {
                 }
             }
         } catch (Exception ex) {
-            System.err.println("Error in server X: " + ex.getMessage());
+            System.err.println("Error in server Y: " + ex.getMessage());
         }
     }
 }

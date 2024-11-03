@@ -1,0 +1,61 @@
+**Time - so many problems can be solved with knowing the timing of certain events
+
+Scheduling tasks - indirectly using time in your computation (future)
+
+Coordination - related to timing 
+
+Synchronization - timing used / 2 nodes in db - these need to start at the same time for read/write
+
+Consistency 
+
+The yad sending message to chnoor and hemin sending to chnoor problem could be solved with just a time stamp on each 
+event 
+
+Each device has a clock - no global clock in global state - there are local clocks 
+
+No GLobal clock is a fundemental issue in distributed systems 
+
+Java clock: System.nanoClock
+
+
+
+Problems: 
+
+1. Precision, you need to capture the timing between the events and this needs you to inrease the ticks to capture them - physical limits (tempareture, power)
+-- when it ticks, how big is the tick - smaller better - you need a precise clock that ticks alot to capture the events 
+
+
+2. Time accuracy - drifting - the ms could be 1 in first week and could be 5 in 5th week 
+-- does the clock give me the current clock compared to the reference clock?
+case study: Cloudflare 102 datacenters Leap Second and DNS 
+
+Every physical clock has a skew factor, if it is a positive number = clock is going fast go past the reference clock, if negative = clock is slow - get behind reference clock
+
+Drift is the derivative of the clock compared to the relative clock 
+
+
+(clock)
+p1 -----------x1-----------
+
+    These event's clocks do not change at the same rate - skew factors are different
+    One could be getting faster one could be slower 
+
+(clock)
+p2 --------------y1--------
+
+
+
+Solution: NTP (Network Time Protocol)
+
+pc1     pc2     pc3     pc4
+
+Each Pc's OS will talk with the NTP server to check for the reference time - it will change the local clock to make it close to the NTP clock 
+-- drift still exists, just bring back the clock to bring it closer to the current time 
+
+The farther the NTP server is, greater distance, the skew factor increases 
+
+
+COnclusion:
+
+No global clock, have local physical clocks - each drifts at different rates - and when geting timestamps
+, you cannot get it right and only get approximation because you do not have a global clock - will always drift by certain amount

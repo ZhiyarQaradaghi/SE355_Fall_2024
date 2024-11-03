@@ -1,8 +1,7 @@
 package Server_X;
 
-import java.io.*;
 import java.net.*;
-import Handlers.ClientReader;
+import Handlers.ClientHandler;
 
 public class X {
     public static void main(String... args) {
@@ -10,10 +9,14 @@ public class X {
             System.out.println("Listening on port: " + server.getLocalPort());
             while (true) {
                 try {
-                    Socket client = server.accept();
-                    String sourceIdentifier = client.getInetAddress().getHostName();
-                    ClientReader readHandler = new ClientReader(client, sourceIdentifier);
-                    new Thread(readHandler).start();
+                    Socket clientA = server.accept();
+                    Socket clientB = server.accept();
+                    ClientHandler readHandlerA = new ClientHandler(clientA);
+                    ClientHandler readHandlerB = new ClientHandler(clientB);
+                    Thread t1 = new Thread(readHandlerA);
+                    Thread t2 = new Thread(readHandlerB);
+                    t1.run();
+                    t2.run();
                 } catch (Exception ex) {
                     System.err.println("Error in client connection: " + ex.getMessage());
                 }

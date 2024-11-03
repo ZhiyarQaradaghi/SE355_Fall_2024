@@ -1,20 +1,22 @@
 package Server_Z;
 
 import java.net.*;
-import Handlers.ClientReader;
-import Services.NumberProcessService;
 
-public class Z {
-    private static NumberProcessService processingService = new NumberProcessService();
-    
+import Handlers.ClientHandler2;
+public class Z {    
     public static void main(String... args) {
         try (ServerSocket server = new ServerSocket(7000)) {
             System.out.println("Server Z is listening on port: " + server.getLocalPort());
             while (true) {
                 try {
-                    Socket incomingConnection = server.accept();
-                    ClientReader readHandler = new ClientReader(incomingConnection, "Z"); 
-                    new Thread(readHandler).start(); 
+                    Socket clientX = server.accept();
+                    Socket clientY = server.accept();
+                    ClientHandler2 readHandlerX = new ClientHandler2(clientX);
+                    ClientHandler2 readHandlerY = new ClientHandler2(clientY);
+                    Thread t1 = new Thread(readHandlerX);
+                    Thread t2 = new Thread(readHandlerY);
+                    t1.run();
+                    t2.run();
                 } catch (Exception ex) {
                     System.err.println("Error getting number: " + ex.getMessage());
                 }
@@ -22,9 +24,5 @@ public class Z {
         } catch (Exception ex) {
             System.err.println("Error in server Z: " + ex.getMessage());
         }
-    }
-
-    public static void processNumber(String message) {
-        processingService.processNumber(message);
     }
 }
