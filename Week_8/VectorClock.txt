@@ -1,0 +1,97 @@
+
+p1   v1 [x,y,z]
+
+p2  v2 [x,y,z]    (p1 is in charge of x, p2 for y, p3 for z)
+
+p3  v3 [x,y,z]
+
+
+----------- RULE -------------
+with every event: add d to vector clock where d is positive (d=1 or any positive)
+
+vt[i] = vt[i] + d for each event in p1
+vt[j] = vt[j] + d for each event in p2
+vt[k] = vt[k] + d for each event in p3
+
+
+example:
+
+
+initial v : [000]
+p1 v1[100]-----[200] (send this [200]with event)
+                |
+                 |
+p2 v2[010]------[220] [get 200 -> update with 010 (add +1 to j) -> [220]]
+
+
+p3 v3[001]
+
+
+COMPARING 
+
+element by element, you must make sure they are all equal to ensure that vh[x] = vk[x],vh[y] = vk[y],vh[z] = vk[z] or any operation 
+
+Exception:for vh < vk ---> atleast all elements are equal but one MUST be vh[x] < vk[x]
+
+
+Concurrency
+
+vh || vk --> _,(vh < vy) && _,(vh < vy);
+
+Happens before:
+
+if x -> y then Vx < Vy 
+
+SO : Vx < Vy then x -> y 
+
+Give me vector clocks, I can conclude causality -- We can compute causality algorithmically (no longer we need a space time diagram, 
+                                                                                            we just need vector clock for x and y then 
+                                                                                            we can conclude if x happens beofre y or vise versa)
+
+Why we use vector clock and not lampart clock? Because we can now compute causality 
+
+EXAMPLE: 
+Concurrency - 
+p1 [300]  p2 [240]
+
+3 > 2 
+0 < 4
+0 = 0
+
+if x || y then their vector clock are concurrent vh || vy 
+
+vh || y <=> x || 
+
+A strongily consistant clock 
+
+example of what we can see from [240] - we had 2 events from p1, 4 events from p2, 0 events from p3 so totally independant from p3 
+
+
+PROBLEMS:
+
+If I have 20 processes then i need [20 processes in the vector] (can we reduce it to a smaller number?)
+
+x -> y and x-> z
+
+total order projections - linear extensions : x<y<z and x<z<y 
+
+The amount of projects you need to come back to the partial order is the minimum amount you can reduce the proccess 
+
+Very difficult calculations, get timestamps of all events, do calc, gather data, review .... too difficult computation
+
+Size of vector = number of processes just to avoid the above 
+
+Why VECTOR clock and NOT ARRAY clock?? 
+
+In lampart clock a = number represented time stamp 
+
+In vector clock its = a set of numbers --- this is one thing (the dimensionality is related to the # processes) but it still is a single timestamp
+-- these vectors represent a POINT !! in a 3d space == timestamp 
+
+a point = 3(or more) numbers -> representing a timestamp -- we are forming a global object shape and changing this shape everytime the clock changes  
+
+
+
+KEY TAKEAWAY:
+
+Always remember, vector clocks can compute causality algorithmically (Which events happen before what event? Take timestamp of one clock compare with other)

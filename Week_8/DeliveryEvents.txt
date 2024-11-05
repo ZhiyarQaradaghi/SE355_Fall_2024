@@ -1,0 +1,65 @@
+Data structure is about storing/receiving data is what you think .... 
+
+But actually it is a powerful control tool- I will be in control of how data will be ordered and delivered 
+
+Put the data structure between the application layer and the transport layer, with a data structure you can change the order or basically just be in control with the order
+
+Having a data structure allows you to reorder messages 
+
+
+Application do not see receieve events ANYMORE, has no idea what order the messages has been receieved, will just ask datastructure for data (abstraction of message ordering)
+send -> receive -> delivery -> process 
+
+If you do not change the order then receive == delivery because the order will not be changed 
+
+This is an abstraction tool, you do not care about how messages are received in which order because you already set the order using the datastructure 
+
+
+The messages get shuffled in the network layer and the re ordering with the data structure happens between the application and transport layers 
+
+
+DEFINITION:
+
+Having a datastructure that garrantees certain delivery policy for you, it simplifies the programmability of the application layer 
+
+-- if i know that my messages will always be delivered in a certain order then programming becomes easier because i do not have to care about the shuffling in network layer 
+
+
+
+DELIVERY POLICIES: FIFO Delivery Policy 
+
+WHATS THE POINT OF FIFO??? First in will always be First Out?? 
+
+The DEFINITION of First in and First out is WRONG DEFINITION...
+
+Proper DEFINITION! --
+
+If you have 2 messages m and m- and each message has (s, r) and (s-, r-), FIFO gaurantees if both come from same source and 
+both have same destination and one of the sends happens before the other one then the receive will happen in the same order as the sending order
+
+if s->s- then FIFO will make r->r- as well 
+
+FIFO ONLY FOR MESSAGES FROM THE SAME SOURCE
+
+
+If you see 2 events, and there is a negation between them x ^ y then that means both x and y happen in the same process
+
+
+example:
+
+All messages from P1, put it in one queue
+All messages from P2, put it in another queue 
+
+Now sort them accoring to their timestamps 
+
+TCP -> FIFO Delivery (A special case of Async Delivery)
+UDP -> Async Delivery 
+
+FIFO Delivery is a subset of Async Delivery - it is its own set due to the policy and datastructure 
+
+Asynchronous delivery is any delivery where causality is partial order 
+
+Another DELIVERY -- LIFO (not used as much in network programming)
+
+Reason: Very unpredictable - (m1 and m2 will shuffle and flip with the more hops between processes) 
+- Only good if you want to reduce latency - always process first newest message (edge case) since you are processing in the opposite order 
