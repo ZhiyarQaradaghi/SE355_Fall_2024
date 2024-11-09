@@ -1,0 +1,64 @@
+FIFO Delivery 
+
+m(s,r)   m`(s`,r`)
+
+if both m and m` come from the same source (p) and both heading towards the same destination and s->s` then when delivered r->r` 
+
+Between two processes, messages are delivered in the same order that they are sent 
+
+Vacaously true statement if T then T, if F then still T - FIFO relies on this 
+
+Casaulity is partially ordered in an Async events, the events are partially ordered 
+
+TCP: FIFO
+UDP: Async without FIFO 
+
+Algorithm in TCP is less complex compared to UDP because you have to worry about the ordering in UDP (write code for re ordering)
+
+-- CAUSAL ORDER DELIVERY (CO)---
+Keeping casuality in check, if there is casuality between 2 send events then the receieve needs to be in the same order 
+
+If r and r` are heading towards the same destination and if s->s` then r->r` if s and s` are concurrent then r`->r and r->r` are the same because its always true 
+
+If s->s` (casually ordered), then r`->r cannot happen unless s || s` (message order delivery)
+
+
+CO is a subset of FIFO which is a subset of Async -- less restriction = more difficult Algorithm
+
+
+PROS:
+CO: 
+- If msg m, m cannot be taken over by a chain of messages that are causally related
+, Keeps the structure of messages and ensures that casuality is received in the same order they are sent
+(We will always keep causality in check)
+
+- You only need one queue compared to the amount of queues you need for FIFO(One per source process) also need timestamps for each msg (scalar/lampart clock cannot be used because of s->s`)
+
+
+CO Property:
+Weak common past
+if you have an event happens before receieve then it cannot happen after send 
+
+Weak common future 
+if you have an event that happens after send, then it cannot happen before recieve 
+
+You cannot have any event between the sending and recieving process unless its concurrent 
+
+(subset of CO)
+Synchornous property: 
+Any event happens happen before recieve must happen before send 
+Any event happens before sent and then it must happen after receieve 
+
+When I am sending data to others then the others will not do anything until they receieve it - SYNC 
+
+CYCLE DEPENDENCIES 
+If you have casuality coming from a set of events and another from another set of events and somehow they come together and get tangled then you can only have ASYNC not SYNC 
+
+How do you know they are tangled? If you take these send and recieve events, plot it in the graph, then that send receieve needs to come back to its same destination like a crown polygon
+
+
+Subsets:
+Sync->CO->FIFO->ASYNC 
+(easy) ----> (difficult)
+
+homework: Total Order Delivery and FIFO Total Order Delivery -- MIDTERM QUESTION 
