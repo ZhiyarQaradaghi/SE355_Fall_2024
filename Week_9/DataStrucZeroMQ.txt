@@ -1,0 +1,40 @@
+Non Functional Requirements from Data Structures between application and transport layer when sending and receiving messages 
+
+At receving end
+-- easier to maintian 
+-- improves safety property of distributed systems (safety property == gaurantees that certain undesirable behavior will not happen in the system)
+                                                    - data integrity , consistency ....
+
+At sending end:
+-- Liveness property -- gaurantees that certain desriable events will happen eventually (availability, robustness, adaptability ...
+
+
+WORST
+Having n queues for n processes is preferred unless space is limited 
+
+BETTER
+We are going to use multi dimensional array
+
+rows are the processes 
+the collumns are the messages 
+
+p1 msg1 msg2 msg3
+p2 msg1 msg2 msg3 
+....
+
+Much BETTER
+Best way: Hash Table 
+
+customize the hash function to give a unique key per destination 
+
+
+
+BEST WAY - 3rd party API 
+
+1. ZeroMQ (MQ = queues)
+2. RabbitMQ 
+These two much faster but not as robust 
+
+3. ApacheKafka (acts as a database - stored - if there is any crash then messages will not be lost (ROBUSTNESS) unlike the other 2)
+(INDUSTRY STANDARD)
+

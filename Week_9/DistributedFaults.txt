@@ -1,0 +1,66 @@
+The most important non functional requirement  when it comes to algorithms is performance 
+The most important non functional requirement  when it comes to distributed systems is robustness - failure is your worst enemy 
+
+
+Software failure refers to both hardware and software 
+
+Process failure - processes failing 
+
+p1 ---- after certain time, this process will misbehave or disappears - this could come from hardware or software and this will effect others with causality 
+
+A computer device works 99% of the time, the 1% = 4 days that is randomely spread throughout the 365 days of the year (10 minutees now, 5 hours tomorrow, 1 hour next month ...)
+
+Now imagine a distributed system with 25 devices and each fails 1% of the time, that translates to 100 days of random distributed downtime 
+
+--- 6 failure types/categories ---
+These are failures because it effects causality - we do not care if internal events work or not, it all depends on causality being able to properly propagate
+
+1. Fail-stop failure : This process somehow knows hes going down, but before he goes he told everyone in the distributed system that he will go down - before going down, he notifies every other process before going down
+|(EXTREMELY RARE - WHEN HARDWARE FAILS, PROCESSES DO NOT GET A CHANCE if hareware fails)
+subset of 
+|
+2. Crash Failure: Other processes cannot communicate to you, when causality cannot propagate to you.
+
+If I have a process and it has a crash failure, I am refering to that given process after a certain time is no longer going to receieve or send any messages 
+When a process disappears, could be hardware, software it doesnt matter. 
+
+Maybe your internal events still run but if causality cannot propagate to you or others cannot reach you, you are crashed 
+
+is a subset of 
+|
+3. Omission failure: Maybe you will send 10 messages, 2 of them will get lost (in crash messages will always get lost) - here there is a partial loss that occurs randomely 
+
+(If I say send omission failure I mean the messages that get lost and receieve omission failure means the receieve messages that do not get receieved)
+
+Which of these 3 are the hardest to engineer to be robust against? Omission failure - Unpredictability and randomness
+
+Because Crash is just a special case of omission failure, fail stop is only a special case of Crash 
+
+subset of
+|
+4. Timing failure: Message arrives either too late or too early -- only in SYNC execution 
+|
+subset of
+|
+5. Byzantine with authentication failure -- random misbehavior (if one process is hacked, how can I contain it and not reach other processes?)
+|
+
+The word Byzantine refers to a process, it receives and sends messages, but somehow it has a misbehavior - an arbitrary behabior - either intentional or unintentional - having failure in memory 
+
+subset
+|
+|
+6. Byzantine failures - Most difficult and engineer against - it has a random behavior but the other processes do not have a way to validate it 
+
+(example: Lab2 B- imagine if Node X makes timestamp always 0 or A always sends timestamp 0 the other nodes will not know why )
+
+
+
+WIth engineering robustness, you have to sacrifiice either liveness or safety properties 
+
+ex: Online websites always value liveness property 
+ex: on twitter, an account had negative followers
+
+-- Resources and Adaptability --
+
+If you have a process, allocate more distributed resources, and incorporate Adaptability

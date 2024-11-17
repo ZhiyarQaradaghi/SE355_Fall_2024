@@ -1,0 +1,10 @@
+org/example/protobuf/AddressBookProtos$Person.class
+org/example/app/Application.class
+org/example/protobuf/AddressBookProtos$Person$1.class
+org/example/protobuf/AddressBookProtos$AddressBook.class
+org/example/protobuf/AddressBookProtos$AddressBookOrBuilder.class
+org/example/protobuf/AddressBookProtos$AddressBook$1.class
+org/example/protobuf/AddressBookProtos$Person$Builder.class
+org/example/protobuf/AddressBookProtos$PersonOrBuilder.class
+org/example/protobuf/AddressBookProtos$AddressBook$Builder.class
+org/example/protobuf/AddressBookProtos.class
