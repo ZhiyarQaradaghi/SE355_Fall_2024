@@ -1,3 +1,4 @@
+package src;
 // agenda 
 /*
  - Recap
@@ -27,3 +28,27 @@
 
 
  */
+
+ import org.zeromq.ZMQ;
+import org.zeromq.ZContext;
+import org.zeromq.SocketType;
+
+public class ZeroMQClient {
+    public static void main(String[] args) {
+        try(ZContext context = new ZContext()) {
+            ZMQ.Socket socket = context.createSocket(SocketType.PUSH);
+            socket.connect("tcp://127.0.0.1:8081");
+            socket.connect("tcp://127.0.0.1:8082");
+
+            int counter = 0;
+            while(!Thread.currentThread().isInterrupted()) {
+                String request = "Hello " + counter++;
+                System.out.println("Sending " + request);
+                socket.send(request.getBytes(ZMQ.CHARSET), 0);
+                Thread.sleep(100);
+            }
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
+    }
+}
