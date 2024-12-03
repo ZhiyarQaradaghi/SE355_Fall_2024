@@ -1,0 +1,105 @@
+- sync local state for stateful system 
+
+one way to do that is with data replication
+
+- how to achieve data replication? Solution 
+
+---------
+
+For some proccesses we need it to be STATEFUL (any product related to DB, files, anything that maintains data)! 
+How can I deal with this problem?
+
+
+You have 2 procceses A B (databases) as stateful, 
+but you need to ensure that A = B have them in sync 
+
+One way to do this is data replication -> the idea of having a copy of the same data on multiple proccesses/nodes 
+
+x must be the same in A and the same in B for A = B 
+
+Replica -> a process/node that has a copy of that replicated data
+
+1- X is read only (const)
+2- X will change over time 
+
+if you have a variable of X in A and in B, this X can be altered in either A or B so your job is to keep them in sync 
+
+Solution: Broadcasting the updated value to the processes will NEVER work in real life 
+
+Why? What will omission failure do? 
+
+One replica - A 
+
+SCENARIO:
+imagine you have a web server, it will host a website, allows users to like a given page. The web serve receives like request,
+ and the number of likes is in replica A database, and web server will send a request to replica A to increase 
+ likes by 1 then A does it and sends back and server sends back to the user
+
+PROBLEM:
+1. Web server sends request to increase by 1, and it fails. Retry increase by one request and fails, try again and it passes. 
+This is a problem with certanity, from web server perspective he needs to make sure the like counter is increased by one in the replica. 
+
+2. Increase request goes through but the acknowledgement by replica A to web server fails,
+with retry method web server will increase by one and acknowledge increase by one and sends back to web server,
+but this will increase like by 2 times. 
+
+Retry strategy: 
+
+- At most, reply once, send request, don't try - ONLY FOR UDP,if TCP doesnt get acknowledgement then automatically sends it again (used in DNS)
+
+- At least one, send request, retry until acknowledgement. 
+
+(WE WANT THIS)
+- Exactly one, send request, only retry for update 
+
+
+Solution 1: The solution to the scenario when likes increase by 2 times instead of one, have a request ID in web server when he sends,
+ keep history of all requests so when A gets it he will know to increase the likes or not - NOT REALISTIC TOO SPACE COMPLEX   
+
+Solution 2: Exactly one update, retry + Idempotent--> f(x) = f(f(x)) = f(f(f(x))) .... - if I can make it idempotent then it should not change 
+
+f(like) = like + 1 <-- NOT Idempotent 
+
+f(userid) = Set holding all user that liked that page UNION {userid}
+
+SET = {'tahir', 'tara'} Union {'tahir'} = {'tahir','tara'} 
+|S| = number of likes 
+
+for subtract
+f(like) = like - 1 
+
+g(x) = S \ {userid} <-- remove the userid from the set 
+|S| = new amount of likes 
+
+
+Another Scenario: 
+
+likes 
+f(x) = idempotent of like function S U {x}
+
+dislikes 
+g(x) = S / {x}
+
+
+user 1, presses like f(x), sends to webserver and acknowledgement fails 
+
+f(x) = f(f(x))
+g(x) = g(g(x))
+
+f(g(f(x))) != g(f(x))
+
+How the idempotent functions behave when you have broadcasting and replicas?
+
+Image you have user and 2 replicas of the same database, we perform f(x) and you broadcast it to both replicas for data replication and sync 
+
+WHat if you call remove to replica 1, and try to broadcast the remove to 2nd replica but fails 
+
+This is inconsistent because x does not exist in first replica but exists in 2nd replica
+
+What if you send add requeest to A and fails but went through B ? WIll it be the same sideffect and local state in the above?
+
+Yes here as well x does not exist in first replica but exists in 2nd replica
+
+How to resynchronize 
+
+How to make it x does not exist in both or exists in both? We will use timestamps .... 

@@ -1,0 +1,63 @@
+C sends to A but also to A` as A` is useful when A fails or load is too high 
+
+REQUIRED: A = A`
+
+YOU cannot just copy and paste the code from A to A` - doesn't mean they will be identical 
+
+This is because each process maintains a local state, local state of A and A` might be different overtime 
+
+
+A = A` MEANS --> code A = code A` AND Local State A = Local State A`
+
+Why do we have local state? 
+
+Can we write a program that does not have a local state?
+-- Automata theory : If you want to design a device/system and it can compute any algorithm,
+                     then that device must be stateful 
+
+Computer devices are designed to be stateful in order to compute any algorithm.
+Hardware: storage is just to manage the state as permanent state 
+
+Software: tools for managing states - variables, datastructure ... 
+
+all these are tools to compute algorithm 
+
+stateless means it doesnt remember and doesnt save the state 
+
+* Writing algorithms under stateful system is much easier than algorithm under stateless
+
+statefulness affects redundancy in distributed systems  
+
+solution 1: make stateful process into stateless 
+
+Have 2 web servers and both of them have shared memory space in a database 
+
+webserver side -> stateless
+db server -> stateful 
+
+CON: PERFORMANCE BAD because of the database connection 
+
+Approach 2 :
+
+Web server put data into cashing layer nodes in Redix DB : keydifference: in memory structure (no server) - you need redundancy  
+
+much faster but still penalty of having to talk to different compoenents to get data
+
+Approach 3 : 
+
+COOKIES! Server does not want to store your information, other servers can interact with you because the data is stored 
+locally 
+
+You made the CLIENT SIDE STATEFUL and server side STATELESS 
+
+
+Approach 4: --most challenging - best method 
+
+rewrite code in web server to do same thing but without trying to maintain a state 
+- a solution that only accepts stateless system 
+
+FUNCTIONAL PROGRAMMING
+-- ARGUMENTS/Parameters in functions/methods instead of declaring and using variables 
+
+combine approaches--
+
