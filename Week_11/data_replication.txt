@@ -103,3 +103,10 @@ Yes here as well x does not exist in first replica but exists in 2nd replica
 How to resynchronize 
 
 How to make it x does not exist in both or exists in both? We will use timestamps .... 
+
+HOMEWORK ==> Idempotent of multiplication and division 
+
+
+Exactly one - try but no side effect 
+
+At least one - keep retry and side effect doesnt matter 

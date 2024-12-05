@@ -1,0 +1,10 @@
+If I have 2 idempotent functions 
+f(x) = f(f(x))
+g(x) = g(g(x))
+
+if f(x) adds and g(x) subtracts 
+g(f(x)) != f(g(f(x))) --> this is created by causality 
+
+The composition of both is not necessarily idempotent 
+
+User 1 asks to execute f(x), then fails and retries and gets ack. <-- idempotent no side effect in retry 
