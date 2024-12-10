@@ -1,5 +1,6 @@
 package src;
 
+
 import java.io.Serializable;
 
 public class Message implements Serializable {
@@ -8,17 +9,28 @@ public class Message implements Serializable {
     private long oldLamportClock;
     private boolean allChunksSent;
     private String messageType;
+    private String process;
 
-    public Message(byte[] fileContent, long oldLamportClock, long newLamportClock, boolean allChunksSent) {
+    public Message(byte[] fileContent, long oldLamportClock, long newLamportClock, boolean allChunksSent, String process, String messageType) {
         this.fileContent = fileContent;
         this.oldLamportClock = oldLamportClock;
         this.newLamportClock = newLamportClock;
         this.allChunksSent = allChunksSent;
+        this.messageType = messageType;
+        this.process = process;
     }
 
     public Message(String messageType) {
         this.allChunksSent = true;
         this.messageType = messageType;
+    }
+
+    public String getProcess() {
+        return process;
+    }
+    
+    public void setProcess(String process) {
+        this.process = process;
     }
 
     public String getMessageType() {
