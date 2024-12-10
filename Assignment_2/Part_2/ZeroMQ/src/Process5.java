@@ -4,13 +4,13 @@ import org.zeromq.*;
 import java.io.*;
 import java.util.*;
 
-public class Process2 {
+public class Process5 {
     public static void main(String[] args) {
         long lamportClock=0;
         try (ZContext context = new ZContext()) {
             ZMQ.Socket socket = context.createSocket(SocketType.SUB);
-            socket.connect("tcp://localhost:5556");
-            socket.subscribe("file-p2");
+            socket.connect("tcp://localhost:5559");
+            socket.subscribe("file-p5");
 
             Message receivedMessage = null;
             boolean allChunksReceived = false;
@@ -37,20 +37,20 @@ public class Process2 {
                 
                 System.out.println("Old Lamport clock: " + receivedMessage.getOldLamportClock());
                 System.out.println("New Lamport clock: " + receivedMessage.getNewLamportClock());
-                System.out.println("Process 2 received chunk: " + new String(receivedMessage.getFileContent()));
+                System.out.println("Process 5 received chunk: " + new String(receivedMessage.getFileContent()));
             }
             
             if (allChunksReceived) {
                 try (ZContext contextFromM = new ZContext()){
                     ZMQ.Socket ackFromM = contextFromM.createSocket(SocketType.SUB);
-                    ackFromM.bind("tcp://*:8002");
+                    ackFromM.bind("tcp://*:8005");
                     ackFromM.subscribe("ackToP");
                     lamportClock++;
                     
                     
                         Thread.sleep(200);
                         byte[] reply = ackFromM.recv(0);
-                        System.out.println("process 2: Received acknowledgement "+ new String(reply, ZMQ.CHARSET));
+                        System.out.println("process 5: Received acknowledgement "+ new String(reply, ZMQ.CHARSET));
                         if (new String(reply, ZMQ.CHARSET).equals("ackToP")) {
                             System.out.println("Waiting 15 seconds...");
                             Thread.sleep(1500);
@@ -61,7 +61,7 @@ public class Process2 {
                     System.out.println("Sending Chunks to Main...");
                     try (ZContext contextToMain = new ZContext()) {
                         ZMQ.Socket sendSocketToMain = contextToMain.createSocket(SocketType.PUB);
-                        sendSocketToMain.connect("tcp://localhost:7002");
+                        sendSocketToMain.connect("tcp://localhost:7005");
                         if (receivedMessages.isEmpty()) {
                             System.out.println("Process did not receive any messages.");
                             return;

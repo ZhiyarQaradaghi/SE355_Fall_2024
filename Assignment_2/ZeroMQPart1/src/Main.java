@@ -9,7 +9,6 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter a file path:");
         String filePath = sc.nextLine();
-        Set<String> processesAcknowledged = new HashSet<>();
 
         try (ZContext context = new ZContext(); FileInputStream fileInput = new FileInputStream(new File(filePath))) {
             ZMQ.Socket socket = context.createSocket(SocketType.PUB);
@@ -41,7 +40,7 @@ public class Main {
                 socket.send(serializedMessage, 0);
                 System.out.println("Sent chunk " + counter + " to: " + topic + " (" + new String(chunk) + ")");
                 lamportClock++;
-                Thread.sleep(100);
+                Thread.sleep(1);
                 counter++;
             }
             
@@ -91,8 +90,8 @@ public class Main {
                 
                 ArrayList<Message> receivedMessages = new ArrayList<>();
 
-                while (receivedMessages.size() < messageList.size()) {
-                    Thread.sleep(100); 
+                while (receivedMessages.size() == messageList.size()) {
+                    Thread.sleep(1); 
                     byte[] messageBytes = receiveSocket.recv(0);
                     
                     System.out.println("Received message size: " + messageBytes.length);
@@ -105,15 +104,7 @@ public class Main {
                     }
                 
                     byte[] content = receivedMessage.getFileContent();
-                    if (content == null) {
-                        System.out.println("Received message with null fileContent, skipping...");
-                        continue;
-                    }
-                
-                    if (content.length == 0) {
-                        System.out.println("Received message with empty fileContent, skipping...");
-                        continue;
-                    }
+                  
                     
                     String messageContent = new String(content);
                     if ("END".equals(messageContent)) {
@@ -143,11 +134,12 @@ public class Main {
                 //     System.out.println("Lamport Clock: " + msg.getNewLamportClock());
                 // }
                 
-                mergeSort(receivedMessages);
+                bubbleSort(receivedMessages);
 
                 System.out.println("After sorting:");
 
                 StringBuilder originalMessage = new StringBuilder();
+                
                 for (Message msg : receivedMessages) {
                     System.out.println("Message content: " + new String(msg.getFileContent()));
                     System.out.println("Lamport Clock: " + msg.getNewLamportClock());
@@ -156,9 +148,13 @@ public class Main {
 
                 System.out.println("Reconstructed Original Message: " + originalMessage);
 
-                String desktopPath = System.getProperty("user.home") + "/Desktop/reconstructed_message.txt";
-                try (FileWriter fileWriter = new FileWriter(desktopPath)) {
-                    fileWriter.write(originalMessage.toString());
+                String desktopPath = System.getProperty("user.home") + "/Desktop/receivedFile";
+                File file = new File(desktopPath);
+                // FileWriter from ITE409 
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    for (Message msgFile : receivedMessages) {
+                        fos.write(msgFile.getFileContent());
+                    }   
                 }
             
                 System.out.println("Reconstructed message saved to: " + desktopPath);
@@ -179,31 +175,20 @@ public class Main {
         return (Message) objectInputStream.readObject();
     }
 
-    public static void mergeSort(List<Message> messages) {
-        if (messages.size() <= 1) return; 
-    
-        int mid = messages.size() / 2;
-        List<Message> left = new ArrayList<>(messages.subList(0, mid));
-        List<Message> right = new ArrayList<>(messages.subList(mid, messages.size()));
-    
-        mergeSort(left);
-        mergeSort(right);
-    
-        merge(messages, left, right);
-    }
-    
-    private static void merge(List<Message> messages, List<Message> left, List<Message> right) {
-        int i = 0, j = 0, k = 0;
-        while (i < left.size() && j < right.size()) {
-            if (left.get(i).getOldLamportClock() <= right.get(j).getOldLamportClock()) {
-                messages.set(k++, left.get(i++));
-            } else {
-                messages.set(k++, right.get(j++));
-            }
+    public static void bubbleSort(List<Message> messages) {
+        int n = messages.size();
+        boolean swapped;    
+        for (int i = 0; i < n - 1; i++) {
+            swapped = false;    
+            for (int j = 0; j < n - i - 1; j++) {
+                if (messages.get(j).getOldLamportClock() > messages.get(j + 1).getOldLamportClock()) {
+                    Message temp = messages.get(j);
+                    messages.set(j, messages.get(j + 1));
+                    messages.set(j + 1, temp);
+                    swapped = true;
+                }
+            }    
+            if (!swapped) break;
         }
-    
-        while (i < left.size()) messages.set(k++, left.get(i++));
-        while (j < right.size()) messages.set(k++, right.get(j++));
     }
-
 }
