@@ -12,7 +12,7 @@ public class Server {
                 System.out.println("Server1: Received "+ new String(reply, ZMQ.CHARSET));
             }
         } catch (Exception e) {
-            // TODO: handle exception
+            
         }
     }
 }

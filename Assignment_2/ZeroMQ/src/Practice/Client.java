@@ -4,7 +4,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.*;
 
 public class Client {
-    public static void main(String...args) throws Exception {
+    public static void main(String...args) {
         try (ZContext context = new ZContext()) {
             ZMQ.Socket socket = context.createSocket(SocketType.PUSH);
             socket.connect("tcp://127.0.0.1:5555");
