@@ -44,16 +44,13 @@ public class Process1 {
                     if ((receivedMessage.getProcess()).equals("file-p1")) {
                         savedMessages.add(receivedMessage);
                         System.out.println("Process1 saved receivedMessage: " + content);
+                    } else {
+                        sendSocket.send(messageBytes, 0);
+                        System.out.println("Process1 forwarded message: " + content);
                     }
                 }
             }
 
-
-            for (byte[] messageBytes : messageBytesList) {
-                sendSocket.send(messageBytes, 0);
-                String content = new String(deserializeMessage(messageBytes).getFileContent());
-                System.out.println("Process1 forwarded receivedMessage: " + content);
-            }
             
 
             for (Message savedMessage : savedMessages) {

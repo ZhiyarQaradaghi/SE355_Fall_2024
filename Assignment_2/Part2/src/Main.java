@@ -39,12 +39,13 @@ public class Main {
                 counter++;
             }   
             System.out.println("Waiting 15 seconds ...");
-            Thread.sleep(15000);
+            Thread.sleep(1500);
+            lamportClock++;
+            
             Message allChunksMessage = new Message("END");
             byte[] allChunksMessageBytes = serializeMessage(allChunksMessage);            
             sendSocket.send(allChunksMessageBytes, 0); 
-            System.out.println("Sent all ChunksMessage to p1" + ": " + allChunksMessage);
-            lamportClock++;
+
 
                 Message receivedMessage = null;
                 boolean allChunksReceived = false;

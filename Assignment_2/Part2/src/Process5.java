@@ -25,28 +25,26 @@ public class Process5 {
                 String content = new String(message.getMessageType());
 
                 if ("END".equals(content)) {
-                    System.out.println("Process4 received 'END'.");
+                    System.out.println("Process5 received 'END'.");
                     allChunksReceived = true;
                 } else {
-                    if (message.getProcess().equals("file-p4")) {
                         savedMessages.add(message);
-                        System.out.println("Process4 saved message: " + content);
-                    } else {
-                        sendSocket.send(messageBytes, 0);
-                        System.out.println("Process4 forwarded message: " + content);
-                    }
+                        System.out.println("Process5 saved message: " + content);
                 }
             }
-            for (Message savedMessage : savedMessages) {
-                byte[] serializedMessage = serializeMessage(savedMessage);
-                sendSocket.send(serializedMessage, 0);
-                System.out.println("Process4 sent saved message to Main: " + new String(savedMessage.getFileContent()));
+
+            if(allChunksReceived) {
+                for (Message savedMessage : savedMessages) {
+                    byte[] serializedMessage = serializeMessage(savedMessage);
+                    sendSocket.send(serializedMessage, 0);
+                    System.out.println("Process5 sent saved message to Main: " + new String(savedMessage.getFileContent()));
+                }
             }
             Message endMessage = new Message("END");
             sendSocket.send(serializeMessage(endMessage), 0);
-            System.out.println("Process4 sent 'END' to Main.");
+            System.out.println("Process5 sent 'END' to Process5.");
         } catch (Exception e) {
-            System.err.println("Error in Process4: " + e.getMessage());
+            System.err.println("Error in Process5: " + e.getMessage());
         }
     }
 
