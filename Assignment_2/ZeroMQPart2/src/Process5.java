@@ -35,7 +35,6 @@ public class Process5 {
                 
                 receivedMessage.setNewLamportClock(lamportClock);
 
-                messageBytesList.add(messageBytes);
 
                 if ("END".equals(receivedMessage.getMessageType())) {
                     System.out.println("Received end-of-chunks receivedMessage.");
@@ -43,20 +42,25 @@ public class Process5 {
                 } else {
                     if ((receivedMessage.getProcess()).equals("file-p5")) {
                         savedMessages.add(receivedMessage);
-                        System.out.println("Process5 saved receivedMessage: " + content);
+                        System.out.println("Process5 saved P5 messages: " + content);
                     } else {
-                        sendSocket.send(messageBytes, 0);
-                        System.out.println("Process5 forwarded message: " + content);
+                        messageBytesList.add(messageBytes);
+                        System.out.println("Process5 saved Messages from other processes: " + content);
                     }
                 }
             }
 
             if(allChunksReceived) {
+                for (byte[] messageBytes : messageBytesList) {
+                    sendSocket.send(messageBytes, 0);
+                    System.out.println("Process5 sending message to Main: " + new String(messageBytes));
+                }
+
                 for (Message savedMessage : savedMessages) {
                     Thread.sleep(1);
                     byte[] serializedMessage = serializeMessage(savedMessage);
                     sendSocket.send(serializedMessage, 0);
-                    System.out.println("Process5 sent saved message to Main: " + new String(savedMessage.getFileContent()));
+                    System.out.println("Process5 sending saved message to Main: " + new String(savedMessage.getFileContent()));
                 }
             }
             Message endMessage = new Message("END");

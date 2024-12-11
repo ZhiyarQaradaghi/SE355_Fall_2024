@@ -59,7 +59,7 @@ public class Process1 {
                 System.out.println("Sending Chunks to Main...");
                     ZMQ.Socket sendSocketToMain = context.createSocket(SocketType.PUB);
                     sendSocketToMain.connect("tcp://localhost:7001");
-                    if (receivedMessages.isEmpty() || receivedMessages.stream().allMatch(Objects::isNull)) {
+                    if (receivedMessages.isEmpty()) {
                         System.out.println("Process did not receive any messages.");
                         return;
                     } else {

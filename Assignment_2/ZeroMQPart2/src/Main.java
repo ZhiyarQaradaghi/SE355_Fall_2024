@@ -45,7 +45,7 @@ public class Main {
             }   
             System.out.println("Waiting 15 seconds ...");
             Thread.sleep(15000);
-            
+            System.out.println("Completed wait, Sending END message to p1...");
             Message allChunksMessage = new Message("END");
             byte[] allChunksMessageBytes = serializeMessage(allChunksMessage);            
             sendSocket.send(allChunksMessageBytes, 0); 
