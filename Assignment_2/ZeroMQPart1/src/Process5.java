@@ -41,54 +41,47 @@ public class Process5 {
             }
             
             if (allChunksReceived) {
-                try (ZContext contextFromM = new ZContext()){
-                    ZMQ.Socket ackFromM = contextFromM.createSocket(SocketType.SUB);
+                    ZMQ.Socket ackFromM = context.createSocket(SocketType.SUB);
                     ackFromM.bind("tcp://*:8005");
                     ackFromM.subscribe("ackToP");
                     lamportClock++;
-                    
-                    
-                        Thread.sleep(200);
-                        byte[] reply = ackFromM.recv(0);
-                        System.out.println("process 5: Received acknowledgement "+ new String(reply, ZMQ.CHARSET));
-                        if (new String(reply, ZMQ.CHARSET).equals("ackToP")) {
-                            System.out.println("Waiting 15 seconds...");
-                            Thread.sleep(15000);
-                            System.out.println("Waiting Completed");
-                        }
-                    } catch (Exception e) {
-                        System.err.println("Error in getting ack from main: "+e.getMessage());
+                
+                
+                    Thread.sleep(200);
+                    byte[] reply = ackFromM.recv(0);
+                    System.out.println("process 5: Received acknowledgement "+ new String(reply, ZMQ.CHARSET));
+                    if (new String(reply, ZMQ.CHARSET).equals("ackToP")) {
+                        System.out.println("Waiting 15 seconds...");
+                        Thread.sleep(15000);
+                        System.out.println("Waiting Completed");
                     }
                     System.out.println("Sending Chunks to Main...");
-                    try (ZContext contextToMain = new ZContext()) {
-                        ZMQ.Socket sendSocketToMain = contextToMain.createSocket(SocketType.PUB);
-                        sendSocketToMain.connect("tcp://localhost:7005");
-                        if (receivedMessages.isEmpty()) {
-                            System.out.println("Process did not receive any messages.");
-                            return;
-                        } else {
-                            int counter = 0;
-                            for (Message message : receivedMessages) {
-                                if (message != null) {
-                                    Thread.sleep(100);
-                                    lamportClock++;
-                                    message.setNewLamportClock(lamportClock);
-                                    byte[] serializedMessage = serializeMessage(message);
-                                    
-                                    sendSocketToMain.send(serializedMessage, 1);
-                                    System.out.println("Sent chunk " + counter + " to Main: (" + message + ")");
-                                    counter++;
-                                }
+                    ZMQ.Socket sendSocketToMain = context.createSocket(SocketType.PUB);
+                    sendSocketToMain.connect("tcp://localhost:7005");
+                    if (receivedMessages.isEmpty()) {
+                        System.out.println("Process did not receive any messages.");
+                        return;
+                    } else {
+                        int counter = 0;
+                        for (Message message : receivedMessages) {
+                            if (message != null) {
+                                Thread.sleep(100);
+                                lamportClock++;
+                                message.setNewLamportClock(lamportClock);
+                                byte[] serializedMessage = serializeMessage(message);
+                                
+                                sendSocketToMain.send(serializedMessage, 1);
+                                System.out.println("Sent chunk " + counter + " to Main: (" + message + ")");
+                                counter++;
                             }
                         }
-                        
-
+                    }
                     
-                        Message allChunksMessage = new Message("END");
-                        byte[] allChunksMessageBytes = serializeMessage(allChunksMessage);
-                        sendSocketToMain.send(allChunksMessageBytes, 1);
-                        System.out.println("Sent allChunksMessage: " + allChunksMessage);
-                    }                    
+                
+                    Message allChunksMessage = new Message("END");
+                    byte[] allChunksMessageBytes = serializeMessage(allChunksMessage);
+                    sendSocketToMain.send(allChunksMessageBytes, 1);
+                    System.out.println("Sent allChunksMessage: " + allChunksMessage);
                 }
 
         } catch (Exception ex) {

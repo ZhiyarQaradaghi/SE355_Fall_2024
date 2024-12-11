@@ -3,7 +3,10 @@ package src;
 import org.zeromq.*;
 import java.io.*;
 import java.util.*;
-
+/*
+Zhiyar Burhan Mahmud - zb21012@auis.edu.krd
+Sharo Kamal Mahmood - sk20353@auis.edu.krd
+ */
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);

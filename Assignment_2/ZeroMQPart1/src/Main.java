@@ -3,7 +3,10 @@ package src;
 import org.zeromq.*;
 import java.io.*;
 import java.util.*;
-
+/*
+Zhiyar Burhan Mahmud - zb21012@auis.edu.krd
+Sharo Kamal Mahmood - sk20353@auis.edu.krd
+ */
 public class Main {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
@@ -52,79 +55,74 @@ public class Main {
                 System.out.println("Sent allChunksMessage to " + Endtopic + ": " + allChunksMessage);
             }
             lamportClock++;
-            try (ZContext contextAckToP = new ZContext()) {
-                ZMQ.Socket ackToP = contextAckToP.createSocket(SocketType.PUB);
-                ackToP.connect("tcp://127.0.0.1:8001");
-                ackToP.connect("tcp://127.0.0.1:8002");
-                ackToP.connect("tcp://127.0.0.1:8003");
-                ackToP.connect("tcp://127.0.0.1:8004");
-                ackToP.connect("tcp://127.0.0.1:8005");
-                    Thread.sleep(1000);
-                    String request = "ackToP ";
-                    System.out.println("Sending " + request);
-                    ackToP.sendMore("ackToP");
-                    ackToP.send(request.getBytes(ZMQ.CHARSET), 1);
-                    System.out.println("Waiting 15 seconds...");
-                    Thread.sleep(15000);
-                    System.out.println("Waiting Completed");
-                    lamportClock++;
-                } catch (Exception ex) {
-                    System.err.println(ex);
+            ZMQ.Socket ackToP = context.createSocket(SocketType.PUB);
+            ackToP.connect("tcp://127.0.0.1:8001");
+            ackToP.connect("tcp://127.0.0.1:8002");
+            ackToP.connect("tcp://127.0.0.1:8003");
+            ackToP.connect("tcp://127.0.0.1:8004");
+            ackToP.connect("tcp://127.0.0.1:8005");
+            Thread.sleep(1000);
+            String request = "ackToP ";
+            System.out.println("Sending " + request);
+            ackToP.sendMore("ackToP");
+            ackToP.send(request.getBytes(ZMQ.CHARSET), 1);
+            System.out.println("Waiting 15 seconds...");
+            Thread.sleep(15000);
+            System.out.println("Waiting Completed");
+            lamportClock++;
+            
+            
+            ZMQ.Socket receiveSocket = context.createSocket(SocketType.SUB);
+            receiveSocket.bind("tcp://*:7001");
+            receiveSocket.bind("tcp://*:7002");
+            receiveSocket.bind("tcp://*:7003");
+            receiveSocket.bind("tcp://*:7004");
+            receiveSocket.bind("tcp://*:7005");
+            receiveSocket.subscribe(""); 
+            Message receivedMessage = null;
+            boolean allChunksReceived = false;
+            lamportClock++;
+            ArrayList<Message> receivedMessages = new ArrayList<>();
+            int EndCounter = 0;
+            System.out.println("Receiving messages back from Processes ... ");
+            while (!allChunksReceived) {
+                Thread.sleep(1); 
+                byte[] messageBytes = receiveSocket.recv(0);                    
+                try {
+                    receivedMessage = deserializeMessage(messageBytes);
+                } catch (Exception e) {
+                    System.out.println("Error deserializing message: " + e.getMessage());
+                    continue;
                 }
-                
-                
-                ZMQ.Socket receiveSocket = context.createSocket(SocketType.SUB);
-                receiveSocket.bind("tcp://*:7001");
-                receiveSocket.bind("tcp://*:7002");
-                receiveSocket.bind("tcp://*:7003");
-                receiveSocket.bind("tcp://*:7004");
-                receiveSocket.bind("tcp://*:7005");
-                receiveSocket.subscribe(""); 
-                Message receivedMessage = null;
-                boolean allChunksReceived = false;
-                lamportClock++;
-                ArrayList<Message> receivedMessages = new ArrayList<>();
-                int EndCounter = 0;
-                System.out.println("Receiving messages back from Processes ... ");
-                while (!allChunksReceived) {
-                    Thread.sleep(1); 
-                    byte[] messageBytes = receiveSocket.recv(0);                    
-                    try {
-                        receivedMessage = deserializeMessage(messageBytes);
-                    } catch (Exception e) {
-                        System.out.println("Error deserializing message: " + e.getMessage());
+                long receivedLamportClock = receivedMessage.getNewLamportClock();
+                lamportClock = Math.max(lamportClock, receivedLamportClock) + 1;
+                receivedMessage.setNewLamportClock(lamportClock);
+                receivedMessages.add(receivedMessage);
+                String messageContent = receivedMessage.getMessageType();
+                if ("END".equals(messageContent)) {
+                    System.out.println("Received 'END' message, skipping..."+" Count: "+EndCounter);
+                    EndCounter++;
+                    if (EndCounter == topics.length) {
+                        allChunksReceived = true;
+                        System.out.println("Received all messages and exiting loop...");
+                    } else {
                         continue;
                     }
-                    long receivedLamportClock = receivedMessage.getNewLamportClock();
-                    lamportClock = Math.max(lamportClock, receivedLamportClock) + 1;
-                    receivedMessage.setNewLamportClock(lamportClock);
-                    receivedMessages.add(receivedMessage);
-                    String messageContent = receivedMessage.getMessageType();
-
-                    if ("END".equals(messageContent)) {
-                        System.out.println("Received 'END' message, skipping..."+" Count: "+EndCounter);
-                        EndCounter++;
-                        if (EndCounter == topics.length) {
-                            allChunksReceived = true;
-                            System.out.println("Received all messages and exiting loop...");
-                        } else {
-                            continue;
-                        }
-                    }
                 }
-                bubbleSort(receivedMessages);
-                // reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf
-                int lastDot = filePath.lastIndexOf('.');
-                String fileExtension = filePath.substring(lastDot);
-                String desktopPath = System.getProperty("user.home") + "/Desktop/reconstructedFile" + fileExtension;
-                File file = new File(desktopPath);
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    for (Message msgFile : receivedMessages) {
-                        fos.write(msgFile.getFileContent());
-                    }   
-                }
-            
-                System.out.println("Reconstructed message saved to: " + desktopPath);
+            }
+            bubbleSort(receivedMessages);
+            // reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf
+            int lastDot = filePath.lastIndexOf('.');
+            String fileExtension = filePath.substring(lastDot);
+            String desktopPath = System.getProperty("user.home") + "/Desktop/reconstructedFile" + fileExtension;
+            File file = new File(desktopPath);
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                for (Message msgFile : receivedMessages) {
+                    fos.write(msgFile.getFileContent());
+                }   
+            }
+        
+            System.out.println("Reconstructed message saved to: " + desktopPath);
         }
     }
 

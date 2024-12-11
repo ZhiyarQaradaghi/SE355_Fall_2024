@@ -41,8 +41,7 @@ public class Process4 {
             }
             
             if (allChunksReceived) {
-                try (ZContext contextFromM = new ZContext()){
-                    ZMQ.Socket ackFromM = contextFromM.createSocket(SocketType.SUB);
+                    ZMQ.Socket ackFromM = context.createSocket(SocketType.SUB);
                     ackFromM.bind("tcp://*:8004");
                     ackFromM.subscribe("ackToP");
                     lamportClock++;
@@ -56,12 +55,9 @@ public class Process4 {
                             Thread.sleep(15000);
                             System.out.println("Waiting Completed");
                         }
-                    } catch (Exception e) {
-                        System.err.println("Error in getting ack from main: "+e.getMessage());
-                    }
-                    System.out.println("Sending Chunks to Main...");
-                    try (ZContext contextToMain = new ZContext()) {
-                        ZMQ.Socket sendSocketToMain = contextToMain.createSocket(SocketType.PUB);
+
+                        System.out.println("Sending Chunks to Main...");
+                        ZMQ.Socket sendSocketToMain = context.createSocket(SocketType.PUB);
                         sendSocketToMain.connect("tcp://localhost:7004");
                         if (receivedMessages.isEmpty()) {
                             System.out.println("Process did not receive any messages.");
@@ -88,7 +84,6 @@ public class Process4 {
                         byte[] allChunksMessageBytes = serializeMessage(allChunksMessage);
                         sendSocketToMain.send(allChunksMessageBytes, 1);
                         System.out.println("Sent allChunksMessage: " + allChunksMessage);
-                    }                    
                 }
 
         } catch (Exception ex) {
