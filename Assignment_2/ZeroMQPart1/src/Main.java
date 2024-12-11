@@ -28,10 +28,10 @@ public class Main {
             
             String topic = "";
             List<Message> messageList = new ArrayList<>();
+            String[] topics = {"file-p1", "file-p2", "file-p3", "file-p4", "file-p5"};
 
-            // chatgpt: How do you read data from a file using FileInputStream and a buffer in Java?"
+            // reference: chatgpt: How do you read data from a file using FileInputStream and a buffer in Java?"
             while ((bytesRead = fileInput.read(buffer)) != -1) {
-                String[] topics = {"file-p1", "file-p2", "file-p3", "file-p4", "file-p5"};
                 topic = topics[rand.nextInt(topics.length)];  
                 byte[] chunk = Arrays.copyOf(buffer, bytesRead);
                 Message message = new Message(chunk, lamportClock, lamportClock + 1, false);
@@ -44,20 +44,14 @@ public class Main {
                 Thread.sleep(1);
                 counter++;
             }
-            
-            
             Message allChunksMessage = new Message("END");
             byte[] allChunksMessageBytes = serializeMessage(allChunksMessage);            
-            String[] topics = {"file-p1", "file-p2", "file-p3", "file-p4", "file-p5"};
             for (String Endtopic : topics) {
                 socket.sendMore(Endtopic); 
                 socket.send(allChunksMessageBytes, 0); 
                 System.out.println("Sent allChunksMessage to " + Endtopic + ": " + allChunksMessage);
             }
             lamportClock++;
-            
-            
-            
             try (ZContext contextAckToP = new ZContext()) {
                 ZMQ.Socket ackToP = contextAckToP.createSocket(SocketType.PUB);
                 ackToP.connect("tcp://127.0.0.1:8001");
@@ -72,6 +66,7 @@ public class Main {
                     ackToP.send(request.getBytes(ZMQ.CHARSET), 1);
                     System.out.println("Waiting 15 seconds...");
                     Thread.sleep(15000);
+                    System.out.println("Waiting Completed");
                     lamportClock++;
                 } catch (Exception ex) {
                     System.err.println(ex);
@@ -88,70 +83,41 @@ public class Main {
                 Message receivedMessage = null;
                 boolean allChunksReceived = false;
                 lamportClock++;
-                
                 ArrayList<Message> receivedMessages = new ArrayList<>();
-
-                while (receivedMessages.size() != messageList.size() + 4) {
+                int EndCounter = 0;
+                System.out.println("Receiving messages back from Processes ... ");
+                while (!allChunksReceived) {
                     Thread.sleep(1); 
-                    byte[] messageBytes = receiveSocket.recv(0);
-                    
-                    System.out.println("Received message size: " + messageBytes.length);
-                
+                    byte[] messageBytes = receiveSocket.recv(0);                    
                     try {
                         receivedMessage = deserializeMessage(messageBytes);
                     } catch (Exception e) {
                         System.out.println("Error deserializing message: " + e.getMessage());
                         continue;
                     }
-                
-                    byte[] content = receivedMessage.getFileContent();
-                  
-                    
-                    String messageContent = new String(content);
-                    if ("END".equals(messageContent)) {
-                        System.out.println("Received 'END' message, skipping...");
-                        continue;
-                    }
-                    System.out.println("Received chunk: " + messageContent);
-                    System.out.println("Old Lamport clock: " + receivedMessage.getOldLamportClock());
-                    System.out.println("New Lamport clock: " + receivedMessage.getNewLamportClock());
-                
                     long receivedLamportClock = receivedMessage.getNewLamportClock();
                     lamportClock = Math.max(lamportClock, receivedLamportClock) + 1;
                     receivedMessage.setNewLamportClock(lamportClock);
-                
                     receivedMessages.add(receivedMessage);
-                    System.out.println("Message list: "+messageList.size());
-                    System.out.println("Received Message list: "+receivedMessages.size());
-                    System.out.println("Received Message Content: " + messageContent);
-                    System.out.println("Received Message Lamport Clock: " + receivedMessage.getNewLamportClock());
+                    String messageContent = receivedMessage.getMessageType();
 
+                    if ("END".equals(messageContent)) {
+                        System.out.println("Received 'END' message, skipping..."+" Count: "+EndCounter);
+                        EndCounter++;
+                        if (EndCounter == topics.length) {
+                            allChunksReceived = true;
+                            System.out.println("Received all messages and exiting loop...");
+                        } else {
+                            continue;
+                        }
+                    }
                 }
-                
-                System.out.println("All chunks received. Total messages: " + receivedMessages.size());
-                // System.out.println("Before sorting:");
-                // for (Message msg : receivedMessages) {
-                //     System.out.println("Message content: " + new String(msg.getFileContent()));
-                //     System.out.println("Lamport Clock: " + msg.getNewLamportClock());
-                // }
-                
                 bubbleSort(receivedMessages);
-
-                System.out.println("After sorting:");
-
-                StringBuilder originalMessage = new StringBuilder();
-                
-                for (Message msg : receivedMessages) {
-                    System.out.println("Message content: " + new String(msg.getFileContent()));
-                    System.out.println("Lamport Clock: " + msg.getNewLamportClock());
-                    originalMessage.append(new String(msg.getFileContent())); 
-                }
-
-                System.out.println("Reconstructed Original Message: " + originalMessage);
-
-                String desktopPath = System.getProperty("user.home") + "/Desktop/receivedFile";
+                // reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf
+                int lastDot = filePath.lastIndexOf('.');
+                String fileExtension = filePath.substring(lastDot);
+                String desktopPath = System.getProperty("user.home") + "/Desktop/reconstructedFile" + fileExtension;
                 File file = new File(desktopPath);
-                // FileWriter from ITE409 
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     for (Message msgFile : receivedMessages) {
                         fos.write(msgFile.getFileContent());

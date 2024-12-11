@@ -55,6 +55,7 @@ public class Process1 {
                         if (new String(reply, ZMQ.CHARSET).equals("ackToP")) {
                             System.out.println("Waiting 15 seconds...");
                             Thread.sleep(15000);
+                            System.out.println("Waiting Completed");
                         }
                     } catch (Exception e) {
                         System.err.println("Error in getting ack from main: "+e.getMessage());

@@ -61,7 +61,7 @@ public class Process5 {
             }
             Message endMessage = new Message("END");
             sendSocket.send(serializeMessage(endMessage), 0);
-            System.out.println("Process5 sent 'END' to Process5.");
+            System.out.println("Process5 sent 'END' to Main.");
         } catch (Exception e) {
             System.err.println("Error in Process5: " + e.getMessage());
         }

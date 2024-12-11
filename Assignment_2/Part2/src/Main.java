@@ -26,7 +26,7 @@ public class Main {
             String process = "";
             List<Message> messageList = new ArrayList<>();
 
-            // chatgpt: How do you read data from a file using FileInputStream and a buffer in Java?"
+            // reference - chatgpt: How do you read data from a file using FileInputStream and a buffer in Java?"
             while ((bytesRead = fileInput.read(buffer)) != -1) {
                 String[] randomProcesses = {"file-p1", "file-p2", "file-p3", "file-p4", "file-p5"};
                 process = randomProcesses[rand.nextInt(randomProcesses.length)];  
@@ -79,11 +79,11 @@ public class Main {
                 
                 bubbleSort(receivedMessages);
                 
+                // reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf
                 int lastDot = filePath.lastIndexOf('.');
                 String fileExtension = filePath.substring(lastDot);
-                String desktopPath = System.getProperty("user.home") + "/Desktop/receivedFile" + fileExtension;
+                String desktopPath = System.getProperty("user.home") + "/Desktop/reconstructedFile" + fileExtension;
                 File file = new File(desktopPath);
-                // FileWriter from ITE409 
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     for (Message msgFile : receivedMessages) {
                         fos.write(msgFile.getFileContent());
