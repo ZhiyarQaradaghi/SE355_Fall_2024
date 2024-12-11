@@ -6,7 +6,6 @@ import java.util.*;
 
 public class Process1 {
     public static void main(String[] args) {
-        long lamportClock = 0;
         List<Message> savedMessages = new ArrayList<>();
 
         try (ZContext context = new ZContext()) {
@@ -18,11 +17,12 @@ public class Process1 {
 
             Message receivedMessage = null;
             boolean allChunksReceived = false;
+            long lamportClock = 0;
             ArrayList<Message> receivedMessages = new ArrayList<>();
             ArrayList<byte[]> messageBytesList = new ArrayList<>();
 
 
-            while (!Thread.currentThread().isInterrupted()&&!allChunksReceived) {
+            while (!allChunksReceived) {
                 Thread.sleep(1);
                 byte[] messageBytes = receiveSocket.recv(0);
 
@@ -54,6 +54,7 @@ public class Process1 {
             
 
             for (Message savedMessage : savedMessages) {
+                Thread.sleep(1);
                 byte[] serializedMessage = serializeMessage(savedMessage);
                 sendSocket.send(serializedMessage, 0);
                 System.out.println("Process1 sent saved receivedMessage to Process2: " + new String(savedMessage.getFileContent()));

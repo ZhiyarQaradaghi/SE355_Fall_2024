@@ -53,7 +53,7 @@ public class Process2 {
                         System.out.println("process 2: Received acknowledgement "+ new String(reply, ZMQ.CHARSET));
                         if (new String(reply, ZMQ.CHARSET).equals("ackToP")) {
                             System.out.println("Waiting 15 seconds...");
-                            Thread.sleep(1500);
+                            Thread.sleep(15000);
                         }
                     } catch (Exception e) {
                         System.err.println("Error in getting ack from main: "+e.getMessage());

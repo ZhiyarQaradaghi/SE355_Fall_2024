@@ -16,21 +16,34 @@ public class Process4 {
             ZMQ.Socket sendSocket = context.createSocket(SocketType.PUSH);
             sendSocket.connect("tcp://localhost:5560");
 
-            while (!Thread.currentThread().isInterrupted()&&!allChunksReceived) {
+            Message receivedMessage = null;
+            long lamportClock = 0;
+            ArrayList<Message> receivedMessages = new ArrayList<>();
+            ArrayList<byte[]> messageBytesList = new ArrayList<>();
+
+
+            while (!allChunksReceived) {
+                Thread.sleep(1);
                 byte[] messageBytes = receiveSocket.recv(0);
 
-                if (messageBytes == null) continue;
+                receivedMessage = deserializeMessage(messageBytes);
+                String content = new String(receivedMessage.getFileContent());
 
-                Message message = deserializeMessage(messageBytes);
-                String content = new String(message.getMessageType());
+                long receivedLamportClock = receivedMessage.getNewLamportClock();
+                receivedMessage.setOldLamportClock(receivedLamportClock);
+                lamportClock = Math.max(lamportClock, receivedLamportClock) + 1;  
+                
+                receivedMessage.setNewLamportClock(lamportClock);
 
-                if ("END".equals(content)) {
-                    System.out.println("Process4 received 'END'.");
+                messageBytesList.add(messageBytes);
+
+                if ("END".equals(receivedMessage.getMessageType())) {
+                    System.out.println("Received end-of-chunks receivedMessage.");
                     allChunksReceived = true;
                 } else {
-                    if (message.getProcess().equals("file-p4")) {
-                        savedMessages.add(message);
-                        System.out.println("Process4 saved message: " + content);
+                    if ((receivedMessage.getProcess()).equals("file-p4")) {
+                        savedMessages.add(receivedMessage);
+                        System.out.println("Process4 saved receivedMessage: " + content);
                     } else {
                         sendSocket.send(messageBytes, 0);
                         System.out.println("Process4 forwarded message: " + content);
@@ -38,6 +51,7 @@ public class Process4 {
                 }
             }
             for (Message savedMessage : savedMessages) {
+                Thread.sleep(1);
                 byte[] serializedMessage = serializeMessage(savedMessage);
                 sendSocket.send(serializedMessage, 0);
                 System.out.println("Process4 sent saved message to Process5: " + new String(savedMessage.getFileContent()));

@@ -29,6 +29,7 @@ public class Main {
             String topic = "";
             List<Message> messageList = new ArrayList<>();
 
+            // chatgpt: How do you read data from a file using FileInputStream and a buffer in Java?"
             while ((bytesRead = fileInput.read(buffer)) != -1) {
                 String[] topics = {"file-p1", "file-p2", "file-p3", "file-p4", "file-p5"};
                 topic = topics[rand.nextInt(topics.length)];  
@@ -70,7 +71,7 @@ public class Main {
                     ackToP.sendMore("ackToP");
                     ackToP.send(request.getBytes(ZMQ.CHARSET), 1);
                     System.out.println("Waiting 15 seconds...");
-                    Thread.sleep(1500);
+                    Thread.sleep(15000);
                     lamportClock++;
                 } catch (Exception ex) {
                     System.err.println(ex);
